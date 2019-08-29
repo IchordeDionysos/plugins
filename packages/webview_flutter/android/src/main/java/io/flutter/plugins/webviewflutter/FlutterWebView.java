@@ -7,6 +7,7 @@ package io.flutter.plugins.webviewflutter;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.hardware.display.DisplayManager;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Handler;
 import android.view.View;
@@ -31,21 +32,9 @@ public class FlutterWebView implements PlatformView, MethodCallHandler {
 
   @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
   @SuppressWarnings("unchecked")
-  FlutterWebView(
-      final Context context,
-      BinaryMessenger messenger,
-      int id,
-      Map<String, Object> params,
-      final View containerView) {
-
-    DisplayListenerProxy displayListenerProxy = new DisplayListenerProxy();
-    DisplayManager displayManager =
-        (DisplayManager) context.getSystemService(Context.DISPLAY_SERVICE);
-    displayListenerProxy.onPreWebViewInitialization(displayManager);
-    webView = new InputAwareWebView(context, containerView);
-    displayListenerProxy.onPostWebViewInitialization(displayManager);
-
-    platformThreadHandler = new Handler(context.getMainLooper());
+  FlutterWebView(Context context, BinaryMessenger messenger, int id, Map<String, Object> params) {
+    webView = new WebView(context);
+    webView.setBackgroundColor(Color.TRANSPARENT);
     // Allow local storage.
     webView.getSettings().setDomStorageEnabled(true);
 
@@ -141,13 +130,9 @@ public class FlutterWebView implements PlatformView, MethodCallHandler {
 
   @SuppressWarnings("unchecked")
   private void loadUrl(MethodCall methodCall, Result result) {
-    Map<String, Object> request = (Map<String, Object>) methodCall.arguments;
-    String url = (String) request.get("url");
-    Map<String, String> headers = (Map<String, String>) request.get("headers");
-    if (headers == null) {
-      headers = Collections.emptyMap();
-    }
-    webView.loadUrl(url, headers);
+    String url = (String) methodCall.arguments;
+    webView.setBackgroundColor(Color.TRANSPARENT);
+    webView.loadUrl(url);
     result.success(null);
   }
 
